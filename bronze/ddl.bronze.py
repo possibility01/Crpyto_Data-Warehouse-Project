@@ -5,6 +5,7 @@ import sys
 driver_name  = "SQL Server"
 server_name = r"Akeelah\SQLEXPRESS"
 database_name = "Crypto_DataWarehouse"
+table_name = "bronze.coin_market"
 
 def connect_sql_server (driver,server,database):
     
@@ -28,19 +29,19 @@ def connect_sql_server (driver,server,database):
 
 def create_bronze_coin_market(cursor):
     try: 
-        print('>>>>>creating bronze coin market table................🔃🔃🔃🔃')
+        print(f'>>>>>creating {table_name}................🔃🔃🔃🔃')
         print("--------------------------------------------------------------")
         
         # Check if table exists
-        cursor.execute("""
-            SELECT OBJECT_ID('bronze.coin_market', 'U')
+        cursor.execute(f"""
+            SELECT OBJECT_ID('{table_name}', 'U')
         """)
         table_exists = cursor.fetchone()[0]
         
         if table_exists:
-            print('>>>>> Table exists, dropping it................🚮')
-            cursor.execute("DROP TABLE bronze.coin_market")
-            print('>>>>> Table dropped successfully................✅')
+            print(f'>>>>> {table_name} Table exists, dropping it................🚮')
+            cursor.execute(f"DROP TABLE {table_name} ")
+            print(f'>>>>> {table_name} Table dropped successfully................✅')
         
         # Create the table
         create_table_sql = """
@@ -65,22 +66,21 @@ def create_bronze_coin_market(cursor):
             max_supply FLOAT,
             ath FLOAT,
             ath_change_percentage FLOAT,
-            ath_date NVARCHAR(50),
+            ath_date DATETIME2,
             atl FLOAT,
             atl_change_percentage FLOAT,
-            atl_date NVARCHAR(50),
-            last_updated NVARCHAR(50),
-            last_data_date NVARCHAR(50)
+            atl_date DATETIME2,
+            last_updated DATETIME2,
+            last_data_date DATETIME2
         );
         """
         cursor.execute(create_table_sql)
-        print('>>>>> bronze coin market table created successfully................✅✅✅')
+        print(f'>>>>> {table_name} table created successfully................✅✅✅')
         print("--------------------------------------------------------------")
         
     except odbc.Error as e:
-        print(f'❌❌📛❌📛❌Error encountered while trying to create bronze coin market table: {e}')
+        print(f'❌❌📛❌📛❌Error encountered while trying to create {table_name}: {e}')
         sys.exit(1)
-
 
 
 def main():
