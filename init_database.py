@@ -75,18 +75,18 @@ def main():
 
         #drop database if exit
         drop_database_if_exist(cursor,new_database)
-        cursor.commit()
+        connection.commit()
 
         #create database
         create_datawarehouse(cursor,new_database)
-        cursor.commit()
+        connection.commit()
 
         cursor.execute(f'USE [{new_database}]')
         print(f'{new_database} IN USE')
 
         #create schema
         create_schemas(cursor,schemas)
-        cursor.commit()
+        connection.commit()
 
     except odbc.Error as e:
         print(f'SQL SERVER ERROR:{e}')
