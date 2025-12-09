@@ -33,7 +33,7 @@ def drop_database_if_exist(cursor,dbname):
 
 
     try:
-        print ('dropping database if existed 🚮🚮🚮')
+        print (f'dropping {dbname} if existed 🚮🚮🚮')
         drop_database = f"""
                 IF EXISTS (SELECT 1 FROM sys.databases WHERE name = '{dbname}')
                 BEGIN 
@@ -43,7 +43,7 @@ def drop_database_if_exist(cursor,dbname):
             """
         cursor.execute(drop_database)
 
-        print("Existing DataWarehouse dropped (if existed) successfully🚮🚮🚮")
+        print(f"Existing {dbname} DataWarehouse dropped (if existed) successfully🚮🚮🚮")
         print("--------------------------------------------------------------")
     except odbc.Error as e:
         print(f'❌❌📛❌📛❌Error encounted while trying to drop database: {e}')
@@ -58,7 +58,7 @@ def create_datawarehouse(cursor,dbname):
 
 def create_schemas(cursor,schemas):
 
-        print(f'creating {schemas}...........................🔃🔃🔃🔃')
+        print(f'creating {schemas} schemas...........................🔃🔃🔃🔃')
 
         for schema in schemas:
             cursor.execute(f'CREATE SCHEMA {schema}')
