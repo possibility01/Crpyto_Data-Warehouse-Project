@@ -49,6 +49,7 @@ def data_type_change(data):
         data['last_data_date'] = pd.to_datetime('today')
         print('Added last_data_date column ✅')
 
+        data = data.where(pd.notnull(data), None)
 
         date_columns  = ['ath_date', 'atl_date', 'last_updated']
         for col in date_columns:
@@ -74,8 +75,19 @@ def data_type_change(data):
         return data
 
     except Exception as e:
-        print(f'Error in data_type_change: {e} ❌')
+        print(f'Error in data_type_change: {e}............. ❌')
         return data
+    
+
+def getting_last_data_date(data):
+
+
+    print('extracting the last batch data..................🔃🔃🔃')
+    data['last_data_date'] = pd.to_datetime(data['last_data_date'], errors='coerce')
+    data['last_data_date'] = data['last_data_date'].dt.floor('s')
+    print('gotten the last data date......................✅✅✅')
+    return data
+
 
 def connect_sql_server (driver,server,database):
     
@@ -99,10 +111,27 @@ def connect_sql_server (driver,server,database):
         sys.exit(1)
 
 
+def data_to_delete(cursor):
 
+    print(f'deleting old data from {table_name}................🔃🔃🔃')
+    try:
 
+        delete_data = f"""
 
+                    WITH Ranked AS (  SELECT * , 
+                            ROW_NUMBER() OVER(PARTITION BY id ORDER BY last_data_date) AS rn
+                            FROM {table_name}
+                            )
+                    DELETE FROM Ranked
+                    WHERE rn > 1 """
 
+        cursor.execute(delete_data)
+
+        print("old rows of data deleted....................✅✅✅✅")
+
+    except Exception as e:
+
+        print (f'error encounted when trying to delete old data:{e}')
 
 
 
@@ -120,14 +149,25 @@ def main():
 
         data = data_type_change(data)
 
+        data = getting_last_data_date(data)
+
         connection = connect_sql_server (driver_name,server_name,database_name)
         cursor = connection.cursor()
+       
+        data_to_delete(cursor)
+        connection.commit()
+
+
+
 
     finally:
         cursor.close()
         connection.close()
+        print ('connection closed successfully ................✅✅✅')
 
-        print ('connection closed................')
+
+        
+    
    
 if __name__ == "__main__":
     main()
