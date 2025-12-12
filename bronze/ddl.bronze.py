@@ -6,7 +6,7 @@ driver_name  = "SQL Server"
 server_name = r"Akeelah\SQLEXPRESS"
 database_name = "Crypto_DataWarehouse"
 table_name = "bronze.coin_market"
-
+table_name2 = "bronze.candle_historical_data"
 def connect_sql_server (driver,server,database):
     
 
@@ -44,8 +44,8 @@ def create_bronze_coin_market(cursor):
             print(f'>>>>> {table_name} Table dropped successfully................✅')
         
         # Create the table
-        create_table_sql = """
-        CREATE TABLE bronze.coin_market (
+        create_table_sql = f"""
+        CREATE TABLE {table_name} (
             id NVARCHAR(200) ,
             symbol NVARCHAR(50),
             name NVARCHAR(200),
@@ -82,6 +82,43 @@ def create_bronze_coin_market(cursor):
         print(f'❌❌📛❌📛❌Error encountered while trying to create {table_name}: {e}')
         sys.exit(1)
 
+def create_candle_historical_data(cursor):
+    try: 
+        print(f'>>>>>creating {table_name2}................🔃🔃🔃🔃')
+        print("--------------------------------------------------------------")
+        
+        # Check if table exists
+        cursor.execute(f"""
+            SELECT OBJECT_ID('{table_name2}', 'U')
+        """)
+        table_exists = cursor.fetchone()[0]
+        
+        if table_exists:
+            print(f'>>>>> {table_name2} Table exists, dropping it................🚮')
+            cursor.execute(f"DROP TABLE {table_name2} ")
+            print(f'>>>>> {table_name2} Table dropped successfully................✅')
+        
+        # Create the table
+        create_table_sql = f"""
+        CREATE TABLE {table_name2} (
+            [timestamp]  BIGINT,
+            [open] FLOAT,
+            [high] FLOAT,
+            [low] FLOAT,
+            [close] FLOAT,
+            coin_id  NVARCHAR(200),
+            coin_name  NVARCHAR(200),
+            [datetime]   DATETIME2
+           
+        );
+        """
+        cursor.execute(create_table_sql)
+        print(f'>>>>> {table_name2} table created successfully................✅✅✅')
+        print("--------------------------------------------------------------")
+        
+    except odbc.Error as e:
+        print(f'❌❌📛❌📛❌Error encountered while trying to create {table_name2}: {e}')
+        sys.exit(1)
 
 def main():
         connection = connect_sql_server (driver_name,server_name,database_name)
@@ -91,6 +128,9 @@ def main():
 
             #drop database if exit
             create_bronze_coin_market(cursor)
+            connection.commit()
+
+            create_candle_historical_data(cursor)
             connection.commit()
 
 
