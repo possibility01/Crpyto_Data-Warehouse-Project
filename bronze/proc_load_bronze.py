@@ -170,33 +170,34 @@ def load_data_into_DB(cursor,data):
         
 
         try:
+            # Replace NaN with None for proper NULL handling
+            data = data.replace({pd.NA: None, float('nan'): None})
 
             print(f'loading new data into {table_name} table .............................🔃🔃🔃🔃')
             if len(data) > 0:
                 load_query = f'''
-                        INSERT INTO {table_name} (
-                id, symbol, name, image, current_price, market_cap, market_cap_rank,
-                fully_diluted_valuation, total_volume, high_24h, low_24h, price_change_24h,
-                price_change_percentage_24h, market_cap_change_24h, market_cap_change_percentage_24h,
-                circulating_supply, total_supply, max_supply, ath, ath_change_percentage, ath_date,
-                atl, atl_change_percentage, atl_date, last_updated, last_data_date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-
-        '''
-            
+                         INSERT INTO {table_name} (
+                    id, symbol, name, image, current_price, market_cap, market_cap_rank,
+                    fully_diluted_valuation, total_volume, high_24h, low_24h, price_change_24h,
+                    price_change_percentage_24h, market_cap_change_24h, market_cap_change_percentage_24h,
+                    circulating_supply, total_supply, max_supply, ath, ath_change_percentage, ath_date,
+                    atl, atl_change_percentage, atl_date, last_updated, last_data_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            '''
+        
                 params_list = [
-            (
-                row['id'], row['symbol'], row['name'], row['image'], row['current_price'],
-                row['market_cap'], row['market_cap_rank'], row['fully_diluted_valuation'],
-                row['total_volume'], row['high_24h'], row['low_24h'], row['price_change_24h'],
-                row['price_change_percentage_24h'], row['market_cap_change_24h'],
-                row['market_cap_change_percentage_24h'], row['circulating_supply'],
-                row['total_supply'], row['max_supply'], row['ath'], row['ath_change_percentage'],
-                row['ath_date'], row['atl'], row['atl_change_percentage'],
-                row['atl_date'], row['last_updated'], row['last_data_date']
-            )
-            for _, row in data.iterrows()
-        ]    
+                 (
+                    row['id'], row['symbol'], row['name'], row['image'], row['current_price'],
+                    row['market_cap'], row['market_cap_rank'], row['fully_diluted_valuation'],
+                    row['total_volume'], row['high_24h'], row['low_24h'], row['price_change_24h'],
+                    row['price_change_percentage_24h'], row['market_cap_change_24h'],
+                    row['market_cap_change_percentage_24h'], row['circulating_supply'],
+                    row['total_supply'], row['max_supply'], row['ath'], row['ath_change_percentage'],
+                    row['ath_date'], row['atl'], row['atl_change_percentage'],
+                    row['atl_date'], row['last_updated'], row['last_data_date']
+                )
+                for _, row in data.iterrows()
+            ] 
 
                 cursor.executemany(load_query,params_list)
 
@@ -209,12 +210,6 @@ def load_data_into_DB(cursor,data):
             print(f'Error when loading new data into {table_name}:{e}..................❌❌❌')
         
 
-
-
-
-
-
-
 def main():
 
 
@@ -223,7 +218,7 @@ def main():
 
         data = connecting_coin_market_api(50)
 
-        data = data_type_change(data)
+        data_type_change(data)
 
         getting_last_data_date(data)
 
