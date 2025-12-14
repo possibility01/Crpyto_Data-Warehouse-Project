@@ -1,3 +1,4 @@
+
 import pypyodbc as odbc
 import sys
 
@@ -13,6 +14,9 @@ coin_categories_info = "bronze.coin_categories_info"
 coin_ticker_info ="bronze.coin_tickers_info"
 coin_links_info = "bronze.coin_links_info"
 coin_platform_info = "bronze.coin_platform_info"
+
+
+
 
 
 def connect_sql_server (driver,server,database):
@@ -35,101 +39,6 @@ def connect_sql_server (driver,server,database):
         print(f'❌❌📛❌📛❌Error encounted while trying to connect to SQL SERVER: {e}')
         sys.exit(1)
 
-def create_bronze_coin_market(cursor,connection):
-    try: 
-        print(f'>>>>>creating {coin_market_table}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-        
-        # Check if table exists
-        cursor.execute(f"""
-            SELECT OBJECT_ID('{coin_market_table}', 'U')
-        """)
-        table_exists = cursor.fetchone()[0]
-        
-        if table_exists:
-            print(f'>>>>> {coin_market_table} Table exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_market_table} ")
-            print(f'>>>>> {coin_market_table} Table dropped successfully................✅')
-            connection.commit()
-        # Create the table
-        create_table_sql = f"""
-        CREATE TABLE {coin_market_table} (
-            id NVARCHAR(200) ,
-            symbol NVARCHAR(50),
-            name NVARCHAR(200),
-            image NVARCHAR(MAX),
-            current_price FLOAT,
-            market_cap BIGINT,
-            market_cap_rank INT,
-            fully_diluted_valuation BIGINT,
-            total_volume BIGINT,
-            high_24h FLOAT,
-            low_24h FLOAT,
-            price_change_24h FLOAT,
-            price_change_percentage_24h FLOAT,
-            market_cap_change_24h FLOAT,
-            market_cap_change_percentage_24h FLOAT,
-            circulating_supply FLOAT,
-            total_supply FLOAT,
-            max_supply NVARCHAR(200),
-            ath FLOAT,
-            ath_change_percentage FLOAT,
-            ath_date DATETIME2,
-            atl FLOAT,
-            atl_change_percentage FLOAT,
-            atl_date DATETIME2,
-            last_updated DATETIME2,
-            last_data_date DATETIME2
-        );
-        """
-        cursor.execute(create_table_sql)
-        connection.commit()
-        print(f'>>>>> {coin_market_table} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-        
-    except odbc.Error as e:
-        print(f'❌❌📛❌📛❌Error encountered while trying to create {coin_market_table}: {e}')
-        sys.exit(1)
-
-def create_candle_historical_data(cursor,connection):
-    try: 
-        print(f'>>>>>creating {coin_historical_data_table}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-        
-        # Check if table exists
-        cursor.execute(f"""
-            SELECT OBJECT_ID('{coin_historical_data_table}', 'U')
-        """)
-        table_exists = cursor.fetchone()[0]
-        
-        if table_exists:
-            print(f'>>>>> {coin_historical_data_table} Table exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_historical_data_table} ")
-            print(f'>>>>> {coin_historical_data_table} Table dropped successfully................✅')
-            connection.commit()
-        # Create the table
-        create_table_sql = f"""
-        CREATE TABLE {coin_historical_data_table} (
-            [timestamp]  BIGINT,
-            [open] FLOAT,
-            [high] FLOAT,
-            [low] FLOAT,
-            [close] FLOAT,
-            coin_id  NVARCHAR(200),
-            coin_name  NVARCHAR(200),
-            [datetime]   DATETIME2
-           
-        );
-        """
-        cursor.execute(create_table_sql)
-        connection.commit()
-        print(f'>>>>> {coin_historical_data_table} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-        
-    except odbc.Error as e:
-        print(f'❌❌📛❌📛❌Error encountered while trying to create {coin_historical_data_table}: {e}')
-        sys.exit(1)
-
 def coin_info_data(cursor, connection):
 
     print('creating information tables ...................................🔄🔄🔄')
@@ -149,7 +58,6 @@ def coin_info_data(cursor, connection):
                 print(f'>>>>> {coin_platform_info} exists, dropping it................🚮')
                 cursor.execute(f"DROP TABLE {coin_platform_info}")
                 connection.commit()
-                print(f'>>>>> {coin_platform_info} Table dropped successfully................✅')
 
             create_table_sql = f"""
             CREATE TABLE {coin_platform_info} (
@@ -184,8 +92,6 @@ def coin_info_data(cursor, connection):
             print(f'>>>>> {coin_basic_info} exists, dropping it................🚮')
             cursor.execute(f"DROP TABLE {coin_basic_info}")
             connection.commit()
-            print(f'>>>>> {coin_basic_info} Table dropped successfully................✅')
-
 
         create_table_sql = f"""
         CREATE TABLE {coin_basic_info} (
@@ -228,7 +134,6 @@ def coin_info_data(cursor, connection):
             print(f'>>>>> {coin_categories_info} exists, dropping it................🚮')
             cursor.execute(f"DROP TABLE {coin_categories_info}")
             connection.commit()
-            print(f'>>>>> {coin_categories_info} Table dropped successfully................✅')
 
         create_table_sql = f"""
         CREATE TABLE {coin_categories_info} (
@@ -264,8 +169,6 @@ def coin_info_data(cursor, connection):
             print(f'>>>>> {coin_developer_info} exists, dropping it................🚮')
             cursor.execute(f"DROP TABLE {coin_developer_info}")
             connection.commit()
-            print(f'>>>>> {coin_developer_info} Table dropped successfully................✅')
-
 
         create_table_sql = f"""
         CREATE TABLE {coin_developer_info} (
@@ -310,8 +213,6 @@ def coin_info_data(cursor, connection):
             print(f'>>>>> {coin_links_info} exists, dropping it................🚮')
             cursor.execute(f"DROP TABLE {coin_links_info}")
             connection.commit()
-            print(f'>>>>> {coin_links_info} Table dropped successfully................✅')
-
 
         create_table_sql = f"""
         CREATE TABLE {coin_links_info} (
@@ -360,8 +261,6 @@ def coin_info_data(cursor, connection):
             print(f'>>>>> {coin_ticker_info} exists, dropping it................🚮')
             cursor.execute(f"DROP TABLE {coin_ticker_info}")
             connection.commit()
-            print(f'>>>>> {coin_ticker_info} Table dropped successfully................✅')
-
 
         create_table_sql = f"""
         CREATE TABLE {coin_ticker_info} (
@@ -425,14 +324,9 @@ def main():
         try:
             cursor = connection.cursor()
 
-            #drop database if exit
-            create_bronze_coin_market(cursor,connection)
-           
-
-            create_candle_historical_data(cursor,connection)
             coin_info_data(cursor,connection)
-           
 
+          
 
         except odbc.Error as e:
             print(f'SQL SERVER ERROR:{e}')
@@ -444,5 +338,3 @@ def main():
 
 if __name__ == "__main__":
     main()        
-
-
