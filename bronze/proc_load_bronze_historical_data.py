@@ -329,13 +329,6 @@ def load_data(all_coin,historical_data,historial_new_coin, full_data_coin , less
         print("All done ✅ and connection is closed .......................✅✅✅")
 
 
-
-    
-
-
-
-
-
 def main():
 
 
