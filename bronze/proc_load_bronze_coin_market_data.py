@@ -208,7 +208,8 @@ def load_data_into_DB(cursor,data):
 
         except Exception as e:
             print(f'Error when loading new data into {table_name}:{e}..................❌❌❌')
-        
+
+    
 
 def main():
 
