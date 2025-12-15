@@ -196,7 +196,7 @@ def coin_info_data(cursor, connection):
             description NVARCHAR(MAX),
             country_origin NVARCHAR(20),
             genesis_date NVARCHAR(20),
-            last_updated NVARCHAR(20)
+            last_updated DATETIME2
         );
         """
 
@@ -275,9 +275,7 @@ def coin_info_data(cursor, connection):
             total_issues BIGINT,
             pull_requests_merged BIGINT,
             pull_request_contributors BIGINT,
-            code_additions_deletions_4_weeks NVARCHAR(50),
             commit_count_4_weeks BIGINT,
-            last_4_weeks_commit_activity_series NVARCHAR(200),
             coin_id NVARCHAR(200)
 
            
@@ -315,18 +313,18 @@ def coin_info_data(cursor, connection):
 
         create_table_sql = f"""
         CREATE TABLE {coin_links_info} (
-            homepage NVARCHAR(200) ,
-            whitepaper NVARCHAR(200),
-            blockchain_site NVARCHAR(200),
-            official_forum_url NVARCHAR(200),
-            chat_url NVARCHAR(200),
-            announcement_url NVARCHAR(200),
-            snapshot_url NVARCHAR(200),
+            homepage NVARCHAR(MAX) ,
+            whitepaper NVARCHAR(MAX),
+            blockchain_site NVARCHAR(MAX),
+            official_forum_url NVARCHAR(MAX),
+            chat_url NVARCHAR(MAX),
+            announcement_url NVARCHAR(MAX),
+            snapshot_url NVARCHAR(MAX),
             twitter_screen_name NVARCHAR(50),
             bitcointalk_thread_identifier FLOAT,
-            subreddit_url NVARCHAR(200),
-            repos_url NVARCHAR(200),
-            coin_id NVARCHAR(200)
+            subreddit_url NVARCHAR(MAX),
+            repos_url NVARCHAR(MAX),
+            coin_id NVARCHAR(MAX)
 
            
         );
@@ -346,77 +344,6 @@ def coin_info_data(cursor, connection):
         sys.exit(1)
 
 
-    try:
-        print(f'>>>>>creating {coin_ticker_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_ticker_info,)
-        )
-        table_exists = cursor.fetchone()[0]
-
-        if table_exists:
-            print(f'>>>>> {coin_ticker_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_ticker_info}")
-            connection.commit()
-            print(f'>>>>> {coin_ticker_info} Table dropped successfully................✅')
-
-
-        create_table_sql = f"""
-        CREATE TABLE {coin_ticker_info} (
-        base NVARCHAR(20),
-        target NVARCHAR(20),
-
-        last FLOAT,
-        volume FLOAT,
-
-        trust_score NVARCHAR(20),
-        bid_ask_spread_percentage FLOAT,
-
-        timestamp DATETIME2,
-        last_traded_at DATETIME2,
-        last_fetch_at DATETIME2,
-
-        is_anomaly BIT,
-        is_stale BIT,
-
-        trade_url NVARCHAR(500),
-        token_info_url NVARCHAR(500),
-
-        coin_id NVARCHAR(200),
-        target_coin_id NVARCHAR(200),
-
-        coin_mcap_usd FLOAT,
-
-        market_name NVARCHAR(200),
-        market_identifier NVARCHAR(200),
-        market_has_trading_incentive BIT,
-
-        converted_last_btc FLOAT,
-        converted_last_eth FLOAT,
-        converted_last_usd FLOAT,
-
-        converted_volume_btc FLOAT,
-        converted_volume_eth FLOAT,
-        converted_volume_usd FLOAT
-);
-
-
-        """
-
-
-        cursor.execute(create_table_sql)
-        connection.commit()
-
-        print(f'>>>>> {coin_ticker_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_ticker_info}: {e}')
-        sys.exit(1)
 
 
 def main():
