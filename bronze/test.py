@@ -1,7 +1,8 @@
 
 import pypyodbc as odbc
 import sys
-
+import requests
+import pandas as pd
 
 driver_name  = "SQL Server"
 server_name = r"Akeelah\SQLEXPRESS"
@@ -39,302 +40,66 @@ def connect_sql_server (driver,server,database):
         print(f'❌❌📛❌📛❌Error encounted while trying to connect to SQL SERVER: {e}')
         sys.exit(1)
 
-def coin_info_data(cursor, connection):
+def getting_top50_coins(connection):
 
-    print('creating information tables ...................................🔄🔄🔄')
-
-    def platform_info():
-        try:
-            print(f'>>>>>creating {coin_platform_info}................🔃🔃🔃🔃')
-            print("--------------------------------------------------------------")
-
-            cursor.execute(
-                "SELECT OBJECT_ID(?, 'U')",
-                (coin_platform_info,)
-            )
-            table_exists = cursor.fetchone()[0]
-
-            if table_exists:
-                print(f'>>>>> {coin_platform_info} exists, dropping it................🚮')
-                cursor.execute(f"DROP TABLE {coin_platform_info}")
-                connection.commit()
-
-            create_table_sql = f"""
-            CREATE TABLE {coin_platform_info} (
-                coin_id NVARCHAR(200) NOT NULL,
-                platform NVARCHAR(50),
-                contract_address NVARCHAR(200)
-            );
-            """
-
-            cursor.execute(create_table_sql)
-            connection.commit()
-
-            print(f'>>>>> {coin_platform_info} table created successfully................✅✅✅')
-            print("--------------------------------------------------------------")
-
-        except odbc.Error as e:
-            connection.rollback()
-            print(f'❌ Error creating {coin_platform_info}: {e}')
-            sys.exit(1)
+    print('Getting coins information...........................🔄🔄🔄')
 
     try:
-        print(f'>>>>>creating {coin_basic_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_basic_info,)
+        coins_df = pd.read_sql(
+            "SELECT DISTINCT id FROM bronze.coin_market WHERE id IS NOT NULL",
+            connection
         )
-        table_exists = cursor.fetchone()[0]
 
-        if table_exists:
-            print(f'>>>>> {coin_basic_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_basic_info}")
-            connection.commit()
+        print(f"Found {len(coins_df)} coins in the database.")
+        return coins_df['id'].tolist()
 
-        create_table_sql = f"""
-        CREATE TABLE {coin_basic_info} (
-            id NVARCHAR(200) NOT NULL,
-            symbol NVARCHAR(10),
-            name NVARCHAR(200),
-            preview_listing BIT NOT NULL DEFAULT 1,
-            description NVARCHAR(MAX),
-            country_origin NVARCHAR(20),
-            genesis_date NVARCHAR(20),
-            last_updated NVARCHAR(20)
-        );
-        """
-
-        cursor.execute(create_table_sql)
-        connection.commit()
-
-        print(f'>>>>> {coin_basic_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-        platform_info()
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_basic_info}: {e}')
+    except Exception as e:
+        print(f'❌ Error getting coins from {coin_market_table}: {e}')
         sys.exit(1)
 
 
-    try:
-        print(f'>>>>>creating {coin_categories_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_categories_info,)
-        )
-        table_exists = cursor.fetchone()[0]
-
-        if table_exists:
-            print(f'>>>>> {coin_categories_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_categories_info}")
-            connection.commit()
-
-        create_table_sql = f"""
-        CREATE TABLE {coin_categories_info} (
-            coin_id NVARCHAR(200) ,
-            category NVARCHAR(50)
-           
-        );
-        """
-
-        cursor.execute(create_table_sql)
-        connection.commit()
-
-        print(f'>>>>> {coin_categories_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_categories_info}: {e}')
-        sys.exit(1)
+def getting_info_data(coin_id):
 
     try:
-        print(f'>>>>>creating {coin_developer_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
+        print(f'Fetching CoinGecko info for {coin_id}........🔄')
 
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_developer_info,)
-        )
-        table_exists = cursor.fetchone()[0]
+        url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
 
-        if table_exists:
-            print(f'>>>>> {coin_developer_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_developer_info}")
-            connection.commit()
+        return response.json()
 
-        create_table_sql = f"""
-        CREATE TABLE {coin_developer_info} (
-            forks BIGINT ,
-            stars BIGINT,
-            subscribers BIGINT,
-            total_issues BIGINT,
-            pull_requests_merged BIGINT,
-            pull_request_contributors BIGINT,
-            code_additions_deletions_4_weeks NVARCHAR(50),
-            commit_count_4_weeks BIGINT,
-            last_4_weeks_commit_activity_series NVARCHAR(200),
-            coin_id NVARCHAR(200)
+    except Exception as e:
+        print(f"❌ Error fetching {coin_id}: {e}")
+        return None
+    
+""" def 
+    all_data = []
 
-           
-        );
-        """
+    for index, row in coins_df.iterrows():
+        coin_id = row['id']
+        result = connecting_coin_market_api(coin_id)
+        if result:
+            all_data.append(result)
+        time.sleep(15) 
 
-        cursor.execute(create_table_sql)
-        connection.commit()
+    print(f"Fetched data for {len(all_data)} coins from CoinGecko.")
 
-        print(f'>>>>> {coin_developer_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_developer_info}: {e}')
-        sys.exit(1)
-
-    try:
-        print(f'>>>>>creating {coin_links_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_links_info,)
-        )
-        table_exists = cursor.fetchone()[0]
-
-        if table_exists:
-            print(f'>>>>> {coin_links_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_links_info}")
-            connection.commit()
-
-        create_table_sql = f"""
-        CREATE TABLE {coin_links_info} (
-            homepage NVARCHAR(200) ,
-            whitepaper NVARCHAR(200),
-            blockchain_site NVARCHAR(200),
-            official_forum_url NVARCHAR(200),
-            chat_url NVARCHAR(200),
-            announcement_url NVARCHAR(200),
-            snapshot_url NVARCHAR(200),
-            twitter_screen_name NVARCHAR(50),
-            bitcointalk_thread_identifier FLOAT,
-            subreddit_url NVARCHAR(200),
-            repos_url NVARCHAR(200),
-            coin_id NVARCHAR(200)
-
-           
-        );
-        """
-
-
-        cursor.execute(create_table_sql)
-        connection.commit()
-
-        print(f'>>>>> {coin_links_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_links_info}: {e}')
-        sys.exit(1)
-
-
-    try:
-        print(f'>>>>>creating {coin_ticker_info}................🔃🔃🔃🔃')
-        print("--------------------------------------------------------------")
-
-        cursor.execute(
-            "SELECT OBJECT_ID(?, 'U')",
-            (coin_ticker_info,)
-        )
-        table_exists = cursor.fetchone()[0]
-
-        if table_exists:
-            print(f'>>>>> {coin_ticker_info} exists, dropping it................🚮')
-            cursor.execute(f"DROP TABLE {coin_ticker_info}")
-            connection.commit()
-
-        create_table_sql = f"""
-        CREATE TABLE {coin_ticker_info} (
-        base NVARCHAR(20),
-        target NVARCHAR(20),
-
-        last FLOAT,
-        volume FLOAT,
-
-        trust_score NVARCHAR(20),
-        bid_ask_spread_percentage FLOAT,
-
-        timestamp DATETIME2,
-        last_traded_at DATETIME2,
-        last_fetch_at DATETIME2,
-
-        is_anomaly BIT,
-        is_stale BIT,
-
-        trade_url NVARCHAR(500),
-        token_info_url NVARCHAR(500),
-
-        coin_id NVARCHAR(200),
-        target_coin_id NVARCHAR(200),
-
-        coin_mcap_usd FLOAT,
-
-        market_name NVARCHAR(200),
-        market_identifier NVARCHAR(200),
-        market_has_trading_incentive BIT,
-
-        converted_last_btc FLOAT,
-        converted_last_eth FLOAT,
-        converted_last_usd FLOAT,
-
-        converted_volume_btc FLOAT,
-        converted_volume_eth FLOAT,
-        converted_volume_usd FLOAT
-);
-
-
-        """
-
-
-        cursor.execute(create_table_sql)
-        connection.commit()
-
-        print(f'>>>>> {coin_ticker_info} table created successfully................✅✅✅')
-        print("--------------------------------------------------------------")
-
-
-    except odbc.Error as e:
-        connection.rollback()
-        print(f'❌ Error creating {coin_ticker_info}: {e}')
-        sys.exit(1)
+    coin_df = pd.json_normalize(all_data)
+    coin_df
+ """
 
 
 def main():
-        connection = connect_sql_server (driver_name,server_name,database_name)
 
-        try:
-            cursor = connection.cursor()
+    connection = connect_sql_server (driver_name,server_name,database_name)
+    cursor = connection.cursor()
+    coin_id = getting_top50_coins(connection)
 
-            coin_info_data(cursor,connection)
+    getting_info_data(coin_id)
 
-          
 
-        except odbc.Error as e:
-            print(f'SQL SERVER ERROR:{e}')
-
-        finally:
-            cursor.close()
-            connection.close()
-            print('connection closed............')
 
 if __name__ == "__main__":
-    main()        
+    main() 
+

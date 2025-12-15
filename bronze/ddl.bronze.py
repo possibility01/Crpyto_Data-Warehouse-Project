@@ -425,7 +425,6 @@ def main():
         try:
             cursor = connection.cursor()
 
-            #drop database if exit
             create_bronze_coin_market(cursor,connection)
            
 
