@@ -82,12 +82,12 @@ def connect_to_api_get_top50_coin(driver,server,database):
             "market_data": False    # skip market data
         }
         
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=20)
             response.raise_for_status()
             data = response.json()
             all_coin_data.append(data)
             print(f"Fetched {coin_id} successfully")
-            return data
+            
         except Exception as e:
             print(f"Error fetching {coin_id}: {e}")
             return None
