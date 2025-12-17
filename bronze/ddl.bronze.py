@@ -11,8 +11,11 @@ coin_basic_info = "bronze.coin_basic_info"
 coin_developer_info = "bronze.coin_developer_info"
 coin_categories_info = "bronze.coin_categories_info"
 coin_ticker_info ="bronze.coin_tickers_info"
-coin_links_info = "bronze.coin_links_info"
+coin_links_info = "bronze.coin_links_social"
 coin_platform_info = "bronze.coin_platform_info"
+coin_link_repo_info = "bronze.coin_links_repo"
+coin_link_all_info = "bronze.coin_link_all_info"
+
 
 
 def connect_sql_server (driver,server,database):
@@ -313,18 +316,14 @@ def coin_info_data(cursor, connection):
 
         create_table_sql = f"""
         CREATE TABLE {coin_links_info} (
-            homepage NVARCHAR(MAX) ,
-            whitepaper NVARCHAR(MAX),
-            blockchain_site NVARCHAR(MAX),
-            official_forum_url NVARCHAR(MAX),
-            chat_url NVARCHAR(MAX),
-            announcement_url NVARCHAR(MAX),
-            snapshot_url NVARCHAR(MAX),
-            twitter_screen_name NVARCHAR(50),
-            bitcointalk_thread_identifier FLOAT,
-            subreddit_url NVARCHAR(MAX),
-            repos_url NVARCHAR(MAX),
-            coin_id NVARCHAR(MAX)
+           
+            coin_id NVARCHAR(100),
+            snapshot_url NVARCHAR(300),
+            twitter_screen_name NVARCHAR(100),
+            facebook_username   NVARCHAR(100),
+            subreddit_url NVARCHAR(300)
+
+
 
            
         );
@@ -344,7 +343,91 @@ def coin_info_data(cursor, connection):
         sys.exit(1)
 
 
+    try:
+        print(f'>>>>>creating {coin_link_repo_info}................🔃🔃🔃🔃')
+        print("--------------------------------------------------------------")
 
+        cursor.execute(
+            "SELECT OBJECT_ID(?, 'U')",
+            (coin_link_repo_info,)
+        )
+        table_exists = cursor.fetchone()[0]
+
+        if table_exists:
+            print(f'>>>>> {coin_link_repo_info} exists, dropping it................🚮')
+            cursor.execute(f"DROP TABLE {coin_link_repo_info}")
+            connection.commit()
+            print(f'>>>>> {coin_link_repo_info} Table dropped successfully................✅')
+
+
+        create_table_sql = f"""
+        CREATE TABLE {coin_link_repo_info} (
+           
+            coin_id     VARCHAR(100),
+            repo_type   VARCHAR(50) ,
+            url         VARCHAR(500) 
+
+
+
+           
+        );
+        """
+
+
+        cursor.execute(create_table_sql)
+        connection.commit()
+
+        print(f'>>>>> {coin_link_repo_info} table created successfully................✅✅✅')
+        print("--------------------------------------------------------------")
+
+
+    except odbc.Error as e:
+        connection.rollback()
+        print(f'❌ Error creating {coin_link_repo_info}: {e}')
+        sys.exit(1)
+
+    try:
+        print(f'>>>>>creating {coin_link_all_info}................🔃🔃🔃🔃')
+        print("--------------------------------------------------------------")
+
+        cursor.execute(
+            "SELECT OBJECT_ID(?, 'U')",
+            (coin_link_all_info,)
+        )
+        table_exists = cursor.fetchone()[0]
+
+        if table_exists:
+            print(f'>>>>> {coin_link_all_info} exists, dropping it................🚮')
+            cursor.execute(f"DROP TABLE {coin_link_all_info}")
+            connection.commit()
+            print(f'>>>>> {coin_link_all_info} Table dropped successfully................✅')
+
+
+        create_table_sql = f"""
+            CREATE TABLE {coin_link_all_info} (
+            
+                coin_id     NVARCHAR(100),
+                url   NVARCHAR(500) ,
+                link_type   NVARCHAR(50) 
+            
+            );
+            """
+
+
+        cursor.execute(create_table_sql)
+        connection.commit()
+
+        print(f'>>>>> {coin_link_all_info} table created successfully................✅✅✅')
+        print("--------------------------------------------------------------")
+
+
+    except odbc.Error as e:
+        connection.rollback()
+        print(f'❌ Error creating {coin_link_all_info}: {e}')
+        sys.exit(1)
+
+
+    
 
 def main():
         connection = connect_sql_server (driver_name,server_name,database_name)
