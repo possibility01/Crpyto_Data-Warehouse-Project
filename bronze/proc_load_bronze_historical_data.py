@@ -7,7 +7,6 @@ import pypyodbc as odbc
 driver_name  = "SQL Server"
 server_name = r"Akeelah\SQLEXPRESS"
 database_name = "Crypto_DataWarehouse"
-table_name = "bronze.coin_market"
 
 
 top_50_table = "bronze.coin_market"
@@ -79,7 +78,7 @@ def getting_historical_data(driver,server,database):
                 coin_df['datetime'] = pd.to_datetime(coin_df['timestamp'], unit='ms')
                 all_data.append(coin_df)
                 
-                print(f"✓ Successfully fetched {len(coin_df)} records for {coin_id}")
+                print(f"✓ Successfully fetched {len(coin_df)} records for {coin_id}...........✅✅✅")
                 time.sleep(20)
                 
             except Exception as e:

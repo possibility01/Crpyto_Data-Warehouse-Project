@@ -83,18 +83,19 @@ def connect_to_api_get_top50_coin(driver,server,database):
 
             url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
             params = {
-            "localization": False,  # exclude all languages except 'en'
+            "localization": False, 
             "sparkline": False,
-            "market_data": False    # skip market data
+            "market_data": False   
         }
         
             response = requests.get(url, params=params)
             response.raise_for_status()
             data = response.json()
             all_coin_data.append(data)
-            print(f"Fetched {coin_id} successfully...............✅✅✅")
+            print(f"Successfully fetched {len(data)} records for {coin_id}...........✅✅✅")
             time.sleep(20)
             print(f"Fetched data for {len(all_coin_data)} coins from CoinGecko.")
+            
             
         except Exception as e:
             print(f"Error fetching {coin_id}: {e}")
