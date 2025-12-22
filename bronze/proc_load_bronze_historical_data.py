@@ -89,7 +89,6 @@ def getting_historical_data(driver,server,database):
     finally:
         connection.close()
 
-    # Combine all data
     try:
         print('Combining all historical data for top 50 coins.....................🔃🔃🔃🔃')
         historical_data = pd.concat(all_data, ignore_index=True) if all_data else pd.DataFrame()
@@ -325,8 +324,8 @@ def load_data(all_coin,historical_data,historial_new_coin, full_data_coin , less
 
         finally:
             cursor.close()
-        connection.close()
-        print("All done ✅ and connection is closed .......................✅✅✅")
+            connection.close()
+            print("All done ✅ and connection is closed .......................✅✅✅")
 
 
 def main():
