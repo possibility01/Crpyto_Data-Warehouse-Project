@@ -80,6 +80,7 @@ def getting_historical_data(driver,server,database):
                 
                 print(f"✓ Successfully fetched {len(coin_df)} records for {coin_id}...........✅✅✅")
                 time.sleep(20)
+                print(f"Fetched data for {len(all_data)} coins from CoinGecko.")
                 
             except Exception as e:
                 print(f"✗ Error fetching {coin_id}: {e}.......................❌❌❌❌")
