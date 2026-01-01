@@ -83,6 +83,7 @@ def create_silver_coin_market(cursor,connection):
             atl_date DATETIME2,
             last_updated DATETIME2,
             last_data_date DATETIME2
+            
         );
         """
         cursor.execute(create_table_sql)

@@ -1,5 +1,6 @@
 import pypyodbc as odbc
 import pandas as pd
+import numpy as np
 import sys
 import time
 
@@ -77,22 +78,30 @@ def cleaning_table(table_data):
         print('cleaning tables.....................................🔄🔄🔄🔄')
 
 
+         
+         
+        coin_market = table_data['bronze.coin_market']
         
-        # coin_market = table_data['bronze.coin_market']
+        
+        
+        float_cols = coin_market.select_dtypes(include='float').columns
+        coin_market.loc[:, float_cols] = coin_market[float_cols].round(2)
+        
+     
+        
+        
+        coin_market = coin_market.replace({pd.NA: None, np.nan: None})
+        table_data['bronze.coin_market'] = coin_market
 
-        # coin_market['max_supply'] = pd.to_numeric(
-        # coin_market['max_supply'], errors='coerce'
-        # )
-
-        # float_cols = coin_market.select_dtypes(include='float').columns
-        # coin_market.loc[:, float_cols] = coin_market[float_cols].round(2)
-
-
+        
         basic_info = table_data['bronze.coin_basic_info']
-        basic_info.loc[:, :] = basic_info.fillna('Not available')
+        basic_info = basic_info.fillna('Not available')
+        table_data['bronze.coin_basic_info'] = basic_info
 
+      
         social_links = table_data["bronze.coin_links_social"]
-        social_links.loc[:,:] =social_links.fillna('Not available')
+        social_links = social_links.fillna('Not available')
+        table_data["bronze.coin_links_social"] = social_links
     
     except Exception as e:
         print(f'Error while trying to clean :{e}')
@@ -144,17 +153,16 @@ def load_data(table_data,driver,server,database):
 
     'silver.coin_market': {
         "id_col": "id",
-        "insert_cols": [
-            "id", "symbol", "name", "image",
-            "current_price", "market_cap",
-            "market_cap_rank", "fully_diluted_valuation" ,
-            "total_volume","high_24h",  "low_24h","price_change_24h","price_change_percentage_24h","market_cap_change_24h" ,
-            "market_cap_change_percentage_24h",
-            "circulating_supply", "total_supply", "max_supply",
-            "ath", "ath_change_percentage",
-            "ath_date", "atl"  ,"atl_change_percentage", "atl_date", "last_updated", "last_data_date",
+         "insert_cols": [
+             "id", "symbol", "name", "image",
+             "current_price", "market_cap",
+             "market_cap_rank", "fully_diluted_valuation" ,
+             "total_volume","high_24h",  "low_24h","price_change_24h","price_change_percentage_24h","market_cap_change_24h" ,
+             "market_cap_change_percentage_24h","circulating_supply", "total_supply", "max_supply",
+             "ath", "ath_change_percentage",
+            "ath_date", "atl"  ,"atl_change_percentage", "atl_date", "last_updated", "last_data_date"
            
-        ],
+       ],
         "source_df":table_data['bronze.coin_market'] 
     },
 								
@@ -219,9 +227,13 @@ def load_data(table_data,driver,server,database):
             insert_cols = conf['insert_cols']
             db_cols = conf.get('db_cols', insert_cols)
 
+            
+
 
             placeholders = ",".join("?" * len(insert_cols))
+             
             params = list(source_df.itertuples(index=False, name=None))
+          
 
             insert_sql = f"""
                             INSERT INTO {table} ({",".join(db_cols)})
