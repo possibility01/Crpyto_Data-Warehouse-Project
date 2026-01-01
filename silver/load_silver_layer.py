@@ -287,20 +287,5 @@ def main():
     cleaning_table(bronze_data)
     load_data(bronze_data,driver_name,server_name,database_name)
 
-        
-
-        
-        
-        
-
-
-
-
- 
-
-
-        
-    
-   
 if __name__ == "__main__":
     main()
