@@ -74,7 +74,7 @@ def create_silver_coin_market(cursor,connection):
             market_cap_change_percentage_24h FLOAT,
             circulating_supply FLOAT,
             total_supply FLOAT,
-            max_supply FLOAT,
+            max_supply NVARCHAR(200),
             ath FLOAT,
             ath_change_percentage FLOAT,
             ath_date DATETIME2,

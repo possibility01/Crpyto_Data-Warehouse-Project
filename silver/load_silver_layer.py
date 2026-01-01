@@ -78,14 +78,14 @@ def cleaning_table(table_data):
 
 
         
-        coin_market = table_data['bronze.coin_market']
+        # coin_market = table_data['bronze.coin_market']
 
-        coin_market['max_supply'] = pd.to_numeric(
-        coin_market['max_supply'], errors='coerce'
-        )
+        # coin_market['max_supply'] = pd.to_numeric(
+        # coin_market['max_supply'], errors='coerce'
+        # )
 
-        float_cols = coin_market.select_dtypes(include='float').columns
-        coin_market.loc[:, float_cols] = coin_market[float_cols].round(2)
+        # float_cols = coin_market.select_dtypes(include='float').columns
+        # coin_market.loc[:, float_cols] = coin_market[float_cols].round(2)
 
 
         basic_info = table_data['bronze.coin_basic_info']
@@ -142,21 +142,21 @@ def load_data(table_data,driver,server,database):
         "source_df": table_data['bronze.candle_historical_data']
     },
 
-#     'silver.coin_market': {
-#         "id_col": "id",
-#         "insert_cols": [
-#             "id", "symbol", "name", "image",
-#             "current_price", "market_cap",
-#             "market_cap_rank", "fully_diluted_valuation" ,
-#             "total_volume","high_24h",  "low_24h","price_change_24h","price_change_percentage_24h","market_cap_change_24h" ,
-#   "market_cap_change_percentage_24h",
-#   "circulating_supply", "total_supply", "max_supply",
-#             "ath", "ath_change_percentage",
-#             "ath_date", "atl"  ,"atl_change_percentage", "atl_date", "last_updated", "last_data_date",
+    'silver.coin_market': {
+        "id_col": "id",
+        "insert_cols": [
+            "id", "symbol", "name", "image",
+            "current_price", "market_cap",
+            "market_cap_rank", "fully_diluted_valuation" ,
+            "total_volume","high_24h",  "low_24h","price_change_24h","price_change_percentage_24h","market_cap_change_24h" ,
+            "market_cap_change_percentage_24h",
+            "circulating_supply", "total_supply", "max_supply",
+            "ath", "ath_change_percentage",
+            "ath_date", "atl"  ,"atl_change_percentage", "atl_date", "last_updated", "last_data_date",
            
-#         ],
-#         "source_df":table_data['bronze.coin_market'] 
-#     },
+        ],
+        "source_df":table_data['bronze.coin_market'] 
+    },
 								
  
         
